@@ -4,7 +4,7 @@
 
 <p>
 
-In this short project, I built a classifier that detect whether a patient diagnosed with COVID-19 is at high risk of death or not, based on the incidence of other diseases and lifestyle factors. The initial dataset was taken from [Kaggle](https://www.kaggle.com/datasets/meirnizri/covid19-dataset/), and subsequently cleaned and pre-processed into a dataset that contains more than 300.000 observations of patients diagnosed with COVID-19. The classes are highly imbalanced (16: 100), with the minority class being only 16% present. 
+In this short project, I built a classifier that detects whether a patient diagnosed with COVID-19 is at high risk of death or not, based on the incidence of other diseases and lifestyle factors. The initial dataset was taken from [Kaggle](https://www.kaggle.com/datasets/meirnizri/covid19-dataset/), and subsequently cleaned and pre-processed into a dataset that contains more than 300.000 observations of patients diagnosed with COVID-19. The classes are highly imbalanced (16: 100), with the minority class (patients at risk of death) being only 16% present. 
 
 </p>
 
@@ -71,11 +71,11 @@ This end-to-end Machine Learning Project employs the following workflow. To quic
 - Create a voting classifier based on three best models and see if better performance can be obtained.
 
 
-###Undersampling
+### Undersampling
 
 Test several methods of undersampling the training set to address the imbalance of classes and improve recall on the test set. 
 
-###Oversampling 
+### Oversampling 
 
 - Make use of SMOTE methods to augment the minority class and evaluate the performance on the test set. 
 
