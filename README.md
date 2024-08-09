@@ -1,102 +1,73 @@
-# Detecting High Risk COVID-19 patients
+# ML-Covid-Predictions
 
-## Motivation
+This repository contains a machine learning model for flagging high risk patients already diagnosed with Covid-19. Given a large number of COVID-19 patients, the model can be used to decide which patients require urgent care, for example by a hospital, to ensure that they receive emergency care to minimise potential complications. It is trained and fine-tuned on data public domain data provided by the Mexican government, available at [Kaggle](https://www.kaggle.com/datasets/meirnizri/covid19-dataset/). The model has over 95% recall - it will detect and flag over 95% high risk patients, but it will also flag many lower risk patients as high risk. You can the model run using Docker.
 
-<p>
+## Prerequisites
 
-In this short project, I built a classifier that detects whether a patient diagnosed with COVID-19 is at high risk of death or not, based on the incidence of other diseases and lifestyle factors. The initial dataset was taken from [Kaggle](https://www.kaggle.com/datasets/meirnizri/covid19-dataset/), and subsequently cleaned and pre-processed into a dataset that contains more than 300.000 observations of patients diagnosed with COVID-19. The classes are highly imbalanced (16: 100), with the minority class (patients at risk of death) being only 16% present. 
+- Docker installed on your machine
 
-</p>
+## Steps to Run the Model
 
-Since the classes are imbalanced, it is very important not only that the classifier detect high risk patients with high accuracy, but also that the detected positives are true positives (actual high risk patients). This is because the cost of misclassifying a high risk patients is potential loss of life, while the cost of misclassifying a lower risk patient is less. This means that recall is more important than accuracy.
+1. **Navigate to the project directory:**
 
-## Files
+    ```sh
+    cd /yourpath/ML-Covid-Predictions
+    ```
 
-This repo contains several files. These are as follow:
+2. **Build the Docker image:**
 
-<ul>
+    ```sh
+    docker build -t docker-api -f Dockerfile .
+    ```
 
-<li> A Jupyter Notebook that contains the end-to-end workflow : cleaning the data, building a pre-processing pipeline, testing and selecting the best model, fine-tuning the best model with undersampling methods and finally saving the final model. </li>
+3. **Run the Docker container:**
 
-<li> The kaggle_covid_data contains the most recent version of the data downloaded through the Kaggle API. </li>
+    ```sh
+    docker run -it -p 5001:5000 docker-api python3 api.py
+    ```
 
-<li> preprocessing.pkl is the saved pre-processing pipeline for the data. </li>
+4. **Make a prediction request:**
 
-<li> covid_data.html is a html report showing an automated exploratory analysis. </li>
+    ```sh
+    curl -X POST http://localhost:5001/predict -H "Content-Type: application/json" -d '{
+        "USMER": 1,
+        "SEX": "Male",
+        "PATIENT_TYPE": "Home", 
+        "INTUBED": 0,
+        "PNEUMONIA": 0,
+        "AGE": 40,
+        "PREGNANT": 0,
+        "DIABETES": 0,
+        "COPD": 0,
+        "ASTHMA": 0,
+        "INMSUPR": 0,
+        "HIPERTENSION": 0,
+        "OTHER_DISEASE": 0,
+        "CARDIOVASCULAR": 0,
+        "OBESITY": 0,
+        "RENAL_CHRONIC": 0,
+        "TOBACCO": 0,
+        "CLASIFFICATION_FINAL": 1,
+        "ICU": 0
+    }'
+    ```
 
-</ul>
+## Notes
 
-## Workflow
+- Ensure that the Docker daemon is running before executing the Docker commands.
+- The API will be accessible at `http://localhost:5001` once the Docker container is running. If configured correctly, the message "Welcome to the Flask API!" will appear on screen. 
 
-The Jupyter Notebook contains the following main sections :
+## Troubleshooting
 
-This end-to-end Machine Learning Project employs the following workflow. To quickly navigate to the desired section, please click on the title of the section
+- Ensure that your Docker installation is up to date.
+- Check the logs of the Docker container for any errors by running:
 
+    ```sh
+    docker logs <container_id>
+    ```
 
+Replace `<container_id>` with the actual container ID obtained from running containers:
 
-### Frame the problem 
-
-- This section clarifies what is the objective of the analysis, that is, detecting high risk COVID-19 positive patients based on comorbidity and life style factors. As classes are imbalanced, it is crucial that the final model achieves very high recall, at the potential expense of accuracy.
- 
-
-### Clean the Data 
-
-- This section deals with imputation of missing values and removal of clearly erroneous results. 
-
-
-
-
-### Split the Data 
-
-- We split the data into a training set and a test set, and we perform all subsequent exploration on a copy of the training set.
-
-### EDA 
-
-- Look for correlations and experiment with columns transformations/
-
-
-### Pre-process Data for Machine Learning Algorithms 
-
-- Create pre-processing pipeline to transform the data, define one evaluation function that can be used to evaluate all ML models, and create final datasets for training and testing.
-
-### Select and Train models 
-
-- Select many classifiers to test against the evaluation metric defined previously, and use hyper-parameter tuning with BayesCV for each model class. 
-
-
-
-
-### Voting Classifier 
-
-- Create a voting classifier based on three best models and see if better performance can be obtained.
-
-
-### Undersampling
-
-Test several methods of undersampling the training set to address the imbalance of classes and improve recall on the test set. 
-
-### Oversampling 
-
-- Make use of SMOTE methods to augment the minority class and evaluate the performance on the test set. 
-
-
-### Generalisation Error
-
-- Make predictions with the best model and the best sampling technique and calculate several performance metrics on the test set
-
-
-### Launch!
-
-- Save model and pre-processing pipeline for further use
-
-
-
-
-## Use and External Validation
-
-The code in the Jupyter notebook can be used to (i) transform and (ii) make predictions on any dataset that contains the same columns as the one inclued in kaggle_covid_data. In general, any dataset that contains information on patients diagnosed with COVID-19, other factors and whetehr they survived or not can be analyzed with the methods proposed in the Notebook.
-
-## Results
-
-By undersampling the majority class on the training set and tuning the hyperparameters of an MLP classifer, I was able to increase the recall at over 93%, which means that about 7% High Risk patients are still misclassified. The best result for TPR was with the Borderline SMOTE method, achieving over 95% recall. It should be noted that higher recall comes at a cost of more false positives, however, as we are interested in misclassifying as few high risk patients as possible, the increase in False Positives is not a major problem.
-
+    ```sh
+    docker ps
+    ```
